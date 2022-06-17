@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -93,7 +92,7 @@ public class OkZoomerClient {
         }
     }
 
-    private static final TranslatableComponent TOAST_TITLE = new TranslatableComponent("toast.okzoomer.title");
+    private static final Component TOAST_TITLE = Component.translatable("toast.okzoomer.title");
 
     public static void sendToast(Component description) {
         if (ClientConfig.SHOW_RESTRICTION_TOASTS.get()) {

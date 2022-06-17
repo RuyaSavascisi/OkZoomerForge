@@ -4,7 +4,6 @@ import com.matyrobbrt.okzoomer.api.MouseModifier;
 import com.matyrobbrt.okzoomer.api.OkZoomerAPI;
 import net.minecraft.resources.ResourceLocation;
 
-//A sin was probably committed by using a lot of for each loops
 /**
  * A mouse modifier that contains multiple mouse modifiers.
  */

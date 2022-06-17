@@ -17,8 +17,7 @@ import com.mojang.brigadier.Command;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -91,7 +90,8 @@ public class OkZoomer {
                             .executes(context -> {
                                 final var preset = context.getArgument("preset", ClientConfig.ZoomPresets.class);
                                 ClientConfig.resetToPreset(preset);
-                                context.getSource().sendSuccess(new TranslatableComponent("command.okzoomer.client.config_present", new TextComponent(preset.toString()).withStyle(ChatFormatting.AQUA)), false);
+                                context.getSource().sendSuccess(Component.translatable("command.okzoomer.client.config_present", Component.literal(preset.toString())
+                                        .withStyle(ChatFormatting.AQUA)), false);
                                 return Command.SINGLE_SUCCESS;
                             }))))));
     }
