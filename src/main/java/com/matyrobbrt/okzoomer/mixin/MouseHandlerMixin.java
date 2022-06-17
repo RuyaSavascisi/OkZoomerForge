@@ -9,7 +9,6 @@ import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import com.matyrobbrt.okzoomer.config.ConfigEnums;
 import com.matyrobbrt.okzoomer.utils.ZoomUtils;
 import net.minecraft.client.MouseHandler;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,25 +22,24 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MouseHandlerMixin {
 
     @Unique
-    private boolean modifyMouse;
+    private boolean okzoomer$modifyMouse;
 
     @Unique
-    private double finalCursorDeltaX;
+    private double okzoomer$finalCursorDeltaX;
 
     @Unique
-    private double finalCursorDeltaY;
+    private double okzoomer$finalCursorDeltaY;
 
     @Inject(
         at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/Options;invertYMouse:Z",
-            opcode = Opcodes.GETFIELD
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/Options;invertYMouse()Lnet/minecraft/client/OptionInstance;"
         ),
         method = "turnPlayer()V",
         locals = LocalCapture.CAPTURE_FAILHARD
     )
     public void okzoomer$applyZoomChanges(CallbackInfo ci, double d, double e, double k, double l, double f, double g, double h, int m) {
-        this.modifyMouse = false;
+        this.okzoomer$modifyMouse = false;
         if (APIImpl.shouldIterateZoom() || APIImpl.shouldIterateModifiers()) {
             for (ZoomInstance instance : APIImpl.getZoomInstances()) {
                 if (instance.getMouseModifier() != null) {
@@ -52,41 +50,39 @@ public abstract class MouseHandlerMixin {
                         double transitionDivisor = instance.getTransitionMode().getInternalMultiplier();
                         k = instance.getMouseModifier().applyXModifier(k, h, e, zoomDivisor, transitionDivisor);
                         l = instance.getMouseModifier().applyYModifier(l, h, e, zoomDivisor, transitionDivisor);
-                        this.modifyMouse = true;
+                        this.okzoomer$modifyMouse = true;
                     }
                 }
             }
         }
-        this.finalCursorDeltaX = k;
-        this.finalCursorDeltaY = l;
+        this.okzoomer$finalCursorDeltaX = k;
+        this.okzoomer$finalCursorDeltaY = l;
     }
 
     @ModifyVariable(
         at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/Options;invertYMouse:Z",
-            opcode = Opcodes.GETFIELD
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/Options;invertYMouse()Lnet/minecraft/client/OptionInstance;"
         ),
         method = "turnPlayer()V",
         ordinal = 2
     )
     private double okzoomer$modifyFinalCursorDeltaX(double k) {
-        if (!this.modifyMouse) return k;
-        return finalCursorDeltaX;
+        if (!this.okzoomer$modifyMouse) return k;
+        return okzoomer$finalCursorDeltaX;
     }
 
     @ModifyVariable(
         at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/Options;invertYMouse:Z",
-            opcode = Opcodes.GETFIELD
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/Options;invertYMouse()Lnet/minecraft/client/OptionInstance;"
         ),
         method = "turnPlayer()V",
         ordinal = 3
     )
     private double okzoomer$modifyFinalCursorDeltaY(double l) {
-        if (!this.modifyMouse) return l;
-        return finalCursorDeltaY;
+        if (!this.okzoomer$modifyMouse) return l;
+        return okzoomer$finalCursorDeltaY;
     }
 
     @Shadow
