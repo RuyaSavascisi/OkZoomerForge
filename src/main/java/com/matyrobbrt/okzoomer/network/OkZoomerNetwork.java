@@ -15,9 +15,6 @@ import com.matyrobbrt.okzoomer.utils.ZoomUtils;
 import com.matyrobbrt.okzoomer.zoom.LinearTransitionMode;
 import com.matyrobbrt.okzoomer.zoom.MultipliedCinematicCameraMouseModifier;
 import com.matyrobbrt.okzoomer.zoom.ZoomerZoomOverlay;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
@@ -58,14 +55,6 @@ public class OkZoomerNetwork {
     public static double minimumZoomDivisor = 0.0D;
     public static SpyglassDependency spyglassDependency = null;
     public static ConfigEnums.ZoomOverlays spyglassOverlay = ConfigEnums.ZoomOverlays.OFF;
-
-    private static final TranslatableComponent TOAST_TITLE = new TranslatableComponent("toast.okzoomer.title");
-
-    public static void sendToast(Component description) {
-        if (ClientConfig.SHOW_RESTRICTION_TOASTS.get()) {
-            Minecraft.getInstance().getToasts().addToast(SystemToast.multiline(Minecraft.getInstance(), SystemToast.SystemToastIds.TUTORIAL_HINT, TOAST_TITLE, description));
-        }
-    }
 
     public static boolean getHasRestrictions() {
         return hasRestrictions;

@@ -11,8 +11,11 @@ import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import com.matyrobbrt.okzoomer.utils.SpyglassHelper;
 import com.matyrobbrt.okzoomer.utils.ZoomUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
@@ -87,6 +90,14 @@ public class OkZoomerClient {
             if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_MIDDLE && ZoomKeyBinds.ZOOM_KEY.isDown() && ClientConfig.RESET_ZOOM_WITH_MOUSE.get()) {
                 ZoomUtils.resetZoomDivisor(true);
             }
+        }
+    }
+
+    private static final TranslatableComponent TOAST_TITLE = new TranslatableComponent("toast.okzoomer.title");
+
+    public static void sendToast(Component description) {
+        if (ClientConfig.SHOW_RESTRICTION_TOASTS.get()) {
+            Minecraft.getInstance().getToasts().addToast(SystemToast.multiline(Minecraft.getInstance(), SystemToast.SystemToastIds.TUTORIAL_HINT, TOAST_TITLE, description));
         }
     }
 }
