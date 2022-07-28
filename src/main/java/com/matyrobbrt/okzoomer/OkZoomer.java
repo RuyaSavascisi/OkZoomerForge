@@ -62,10 +62,7 @@ public class OkZoomer {
                 OkZoomerNetwork.CHANNEL.messageBuilder(clazz, pktIndex++)
                         .encoder(Packet::encode)
                         .decoder(decode)
-                        .consumer((pkt, sup) -> {
-                            pkt.handle(sup.get());
-                            return true;
-                        })
+                        .consumerMainThread((pkt, sup) -> pkt.handle(sup.get()))
                         .add();
             }
         }
@@ -97,13 +94,13 @@ public class OkZoomer {
     }
 
     static void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getPlayer() instanceof ServerPlayer player) {
+        if (event.getEntity() instanceof ServerPlayer player) {
              ServerConfig.sendPacket(player);
         }
     }
 
     static void onPlayerLogout(final PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getPlayer() instanceof ServerPlayer player && OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.getConnection())) {
+        if (event.getEntity() instanceof ServerPlayer player && OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.getConnection())) {
             OkZoomerNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ResetRestrictionsPacket());
         }
     }

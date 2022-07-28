@@ -85,30 +85,6 @@ public abstract class MouseHandlerMixin {
         return okzoomer$finalCursorDeltaY;
     }
 
-    @Shadow
-    private double accumulatedScroll;
-
-    // Handles zoom scrolling
-    @Inject(
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/MouseHandler;accumulatedScroll:D", ordinal = 7),
-            method = "onScroll",
-            cancellable = true
-    )
-    private void okzoomer$handleZoom(long l, double d, double e, CallbackInfo info) {
-        if (this.accumulatedScroll != 0.0) {
-            if (ClientConfig.ALLOW_SCROLLING.get() && !OkZoomerNetwork.getDisableZoomScrolling()) {
-                if (ClientConfig.ZOOM_MODE.get().equals(ConfigEnums.ZoomModes.PERSISTENT)) {
-                    if (!ZoomKeyBinds.ZOOM_KEY.isDown()) return;
-                }
-
-                if (ZoomUtils.ZOOMER_ZOOM.getZoom()) {
-                    ZoomUtils.changeZoomDivisor(this.accumulatedScroll > 0.0);
-                    info.cancel();
-                }
-            }
-        }
-    }
-
     // Prevents the spyglass from working if zooming replaces its zoom
     @ModifyExpressionValue(
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isScoping()Z"),

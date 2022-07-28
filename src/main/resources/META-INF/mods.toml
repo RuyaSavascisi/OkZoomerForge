@@ -15,7 +15,7 @@ credits = "EnnuiL, for the Fabric mod"
 [[dependencies.okzoomer]] #optional
 modId = "forge" #mandatory
 mandatory = true #mandatory
-versionRange = "[41,)" #mandatory
+versionRange = "[41.1.0,)" #mandatory
 ordering = "NONE"
 side = "SERVER"
 [[dependencies.okzoomer]]

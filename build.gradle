@@ -122,6 +122,7 @@ tasks.named('shadowJar', ShadowJar).configure {
 	dependsOn('relocateShadowJar')
 	manifest.attributes(makeAttributes())
 	from sourceSets.api.output
+	from 'LICENSE'
 }
 
 jar {

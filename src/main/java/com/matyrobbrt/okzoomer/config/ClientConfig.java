@@ -62,7 +62,8 @@ public class ClientConfig {
                     "'PERSISTENT' makes the zoom permanent.").defineEnum("zoom_mode", ConfigEnums.ZoomModes.HOLD);
             ALLOW_SCROLLING = builder.comment("Allows to increase or decrease zoom by scrolling.")
                     .define("zoom_scrolling", true);
-            EXTRA_KEY_BINDS = builder.comment("Adds zoom manipulation keys along with the zoom key.")
+            EXTRA_KEY_BINDS = builder.comment("Adds zoom manipulation keys along with the zoom key.",
+                            "Note that this config will NOT prevent the keybinds from being registered, but they will become unusable if false.")
                     .define("extra_key_binds", true);
             ZOOM_OVERLAY = builder.comment("Adds an overlay in the screen during zoom.",
                     "'VIGNETTE' uses a vignette as the overlay.",

@@ -29,9 +29,6 @@ public class ZoomKeyBinds {
 
 	// The method used to get the extra keybinds, if disabled, return null.
 	public static KeyMapping getExtraKeyBind(String translationKey) {
-		if (areExtraKeyBindsEnabled()) {
-			return new KeyMapping(translationKey, InputConstants.UNKNOWN.getValue(), ZOOM_CATEGORY);
-		}
-		return null;
+		return new KeyMapping(translationKey, InputConstants.UNKNOWN.getValue(), ZOOM_CATEGORY);
 	}
 }
