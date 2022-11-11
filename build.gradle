@@ -123,6 +123,7 @@ tasks.named('shadowJar', ShadowJar).configure {
 	manifest.attributes(makeAttributes())
 	from sourceSets.api.output
 	from 'LICENSE'
+	exclude 'META-INF/services/javax.*'
 }
 
 jar {
