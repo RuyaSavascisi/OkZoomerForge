@@ -1,7 +1,7 @@
 package com.matyrobbrt.okzoomer.utils;
 
 import com.matyrobbrt.okzoomer.api.OkZoomerAPI;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -13,5 +13,5 @@ public class SpyglassHelper {
     /**
      * The spyglass tag, which is used internally in order to unhardcode behavior specific to vanilla spyglasses
      */
-    public static final TagKey<Item> SPYGLASSES = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(OkZoomerAPI.MOD_ID, "spyglasses"));
+    public static final TagKey<Item> SPYGLASSES = TagKey.create(Registries.ITEM, new ResourceLocation(OkZoomerAPI.MOD_ID, "spyglasses"));
 }

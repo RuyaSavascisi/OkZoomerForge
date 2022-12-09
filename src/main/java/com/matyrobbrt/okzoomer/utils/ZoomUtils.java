@@ -6,6 +6,7 @@ import com.matyrobbrt.okzoomer.api.modifiers.ZoomDivisorMouseModifier;
 import com.matyrobbrt.okzoomer.api.transitions.SmoothTransitionMode;
 import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -28,7 +29,7 @@ public class ZoomUtils {
             null
     ));
 
-    public static final TagKey<Item> ZOOM_DEPENDENCIES_TAG = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(OkZoomerAPI.MOD_ID, "zoom_dependencies"));
+    public static final TagKey<Item> ZOOM_DEPENDENCIES_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(OkZoomerAPI.MOD_ID, "zoom_dependencies"));
 
     public static int zoomStep = 0;
 

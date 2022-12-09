@@ -176,7 +176,7 @@ public class OkZoomerNetwork {
                 default -> null;
             };
             ZoomUtils.ZOOMER_ZOOM.setMouseModifier(reduceSensitivity
-                    ? new ContainingMouseModifier(cinematicModifier, new ZoomDivisorMouseModifier())
+                    ? new ContainingMouseModifier(new ZoomDivisorMouseModifier(), cinematicModifier)
                     : cinematicModifier
             );
         } else {
