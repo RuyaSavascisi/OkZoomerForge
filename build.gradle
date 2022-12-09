@@ -17,9 +17,15 @@ plugins {
 	id 'eclipse'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'io.github.groovymc.modsdotgroovy' version '1.1.2'
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+
+modsDotGroovy {
+	dslVersion = '1.2.0'
+	platform 'forge'
+}
 
 group = 'com.matyrobbrt.okzoomer' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = modid + "-forge-" + minecraft_version
