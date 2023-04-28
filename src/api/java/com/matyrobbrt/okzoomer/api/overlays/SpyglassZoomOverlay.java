@@ -73,7 +73,6 @@ public class SpyglassZoomOverlay implements ZoomOverlay {
         bufferBuilder.vertex(j, k, -90.0D).uv(0.0F, 0.0F).endVertex();
         tesselator.end();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.disableTexture();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         bufferBuilder.vertex(0.0D, scaledHeight, -90.0D).color(0, 0, 0, 255).endVertex();
         bufferBuilder.vertex(scaledWidth, scaledHeight, -90.0D).color(0, 0, 0, 255).endVertex();
@@ -92,7 +91,6 @@ public class SpyglassZoomOverlay implements ZoomOverlay {
         bufferBuilder.vertex(scaledWidth, k, -90.0D).color(0, 0, 0, 255).endVertex();
         bufferBuilder.vertex(l, k, -90.0D).color(0, 0, 0, 255).endVertex();
         tesselator.end();
-        RenderSystem.enableTexture();
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

@@ -100,7 +100,7 @@ public class OkZoomer {
     }
 
     static void onPlayerLogout(final PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.getConnection())) {
+        if (event.getEntity() instanceof ServerPlayer player && OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.connection)) {
             OkZoomerNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ResetRestrictionsPacket());
         }
     }
