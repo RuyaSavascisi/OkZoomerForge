@@ -87,7 +87,7 @@ public class OkZoomer {
                             .executes(context -> {
                                 final var preset = context.getArgument("preset", ClientConfig.ZoomPresets.class);
                                 ClientConfig.resetToPreset(preset);
-                                context.getSource().sendSuccess(Component.translatable("command.okzoomer.client.config_present", Component.literal(preset.toString())
+                                context.getSource().sendSuccess(() -> Component.translatable("command.okzoomer.client.config_present", Component.literal(preset.toString())
                                         .withStyle(ChatFormatting.AQUA)), false);
                                 return Command.SINGLE_SUCCESS;
                             }))))));
