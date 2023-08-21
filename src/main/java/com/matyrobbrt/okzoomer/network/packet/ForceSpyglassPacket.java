@@ -19,7 +19,7 @@ public record ForceSpyglassPacket(ConfigEnums.SpyglassDependency dependency) imp
 
     @Override
     public void handle(NetworkEvent.Context context) {
-        OkZoomerNetwork.spyglassDependency = dependency;
+        OkZoomerNetwork.spyglassDependency = (dependency == ConfigEnums.SpyglassDependency.OFF ? null : dependency);
         OkZoomerNetwork.checkRestrictions();
         OkZoomerNetwork.configureZoomInstance();
         if (dependency() != ConfigEnums.SpyglassDependency.OFF)
