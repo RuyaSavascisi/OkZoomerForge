@@ -1,38 +1,38 @@
 package com.matyrobbrt.okzoomer.config;
 
-import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import com.matyrobbrt.okzoomer.network.packet.AcknowledgeModPacket;
 import com.matyrobbrt.okzoomer.network.packet.DisableZoomPacket;
 import com.matyrobbrt.okzoomer.network.packet.DisableZoomScrollingPacket;
+import com.matyrobbrt.okzoomer.network.packet.ExistingPacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceClassicModePacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceOverlayPacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceSpyglassPacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceZoomDivisorPacket;
 import com.matyrobbrt.okzoomer.utils.ZoomUtils;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 
 public class ServerConfig {
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
-    public static final BooleanValue ALLOW_ZOOM;
-    public static final BooleanValue DISABLE_ZOOM_SCROLLING;
-    public static final BooleanValue FORCE_CLASSIC_MODE;
-    public static final ForgeConfigSpec.DoubleValue MINIMUM_ZOOM_DIVISOR;
-    public static final ForgeConfigSpec.DoubleValue MAXIMUM_ZOOM_DIVISOR;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.SpyglassDependency> SPYGLASS_DEPENDENCY;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.ZoomOverlays> ZOOM_OVERLAY;
+    public static final ModConfigSpec.BooleanValue ALLOW_ZOOM;
+    public static final ModConfigSpec.BooleanValue DISABLE_ZOOM_SCROLLING;
+    public static final ModConfigSpec.BooleanValue FORCE_CLASSIC_MODE;
+    public static final ModConfigSpec.DoubleValue MINIMUM_ZOOM_DIVISOR;
+    public static final ModConfigSpec.DoubleValue MAXIMUM_ZOOM_DIVISOR;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.SpyglassDependency> SPYGLASS_DEPENDENCY;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.ZoomOverlays> ZOOM_OVERLAY;
 
     static {
-        final var builder = new ForgeConfigSpec.Builder();
+        final var builder = new ModConfigSpec.Builder();
 
         ALLOW_ZOOM = builder.comment("If players should be allowed to zoom using OkZoomer.")
                 .define("allow_zoom", true);
@@ -66,16 +66,15 @@ public class ServerConfig {
     }
 
     public static void sendPacket(ServerPlayer player) {
-        if (OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.connection)) {
-            final var packets = new ArrayList<>();
-            packets.add(new DisableZoomPacket(!ALLOW_ZOOM.get()));
+        if (player.connection.hasChannel(ExistingPacket.TYPE)) {
+            final var packets = new ArrayList<CustomPacketPayload>();
             packets.add(new DisableZoomScrollingPacket(DISABLE_ZOOM_SCROLLING.get()));
             packets.add(new ForceClassicModePacket(FORCE_CLASSIC_MODE.get()));
             packets.add(new ForceZoomDivisorPacket(MINIMUM_ZOOM_DIVISOR.get(), MAXIMUM_ZOOM_DIVISOR.get()));
             packets.add(new ForceSpyglassPacket(SPYGLASS_DEPENDENCY.get()));
             packets.add(new ForceOverlayPacket(ZOOM_OVERLAY.get()));
             packets.add(new AcknowledgeModPacket());
-            packets.forEach(pkt -> OkZoomerNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), pkt));
+            PacketDistributor.sendToPlayer(player, new DisableZoomPacket(!ALLOW_ZOOM.get()), packets.toArray(CustomPacketPayload[]::new));
         }
     }
 }

@@ -8,35 +8,30 @@ import com.matyrobbrt.okzoomer.api.modifiers.ZoomDivisorMouseModifier;
 import com.matyrobbrt.okzoomer.api.overlays.SpyglassZoomOverlay;
 import com.matyrobbrt.okzoomer.api.transitions.InstantTransitionMode;
 import com.matyrobbrt.okzoomer.api.transitions.SmoothTransitionMode;
+import com.matyrobbrt.okzoomer.config.ClientConfig;
 import com.matyrobbrt.okzoomer.config.ConfigEnums;
 import com.matyrobbrt.okzoomer.config.ConfigEnums.SpyglassDependency;
-import com.matyrobbrt.okzoomer.config.ClientConfig;
 import com.matyrobbrt.okzoomer.utils.ZoomUtils;
 import com.matyrobbrt.okzoomer.zoom.LinearTransitionMode;
 import com.matyrobbrt.okzoomer.zoom.MultipliedCinematicCameraMouseModifier;
 import com.matyrobbrt.okzoomer.zoom.ZoomerZoomOverlay;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.event.EventNetworkChannel;
-import net.minecraftforge.network.simple.SimpleChannel;
 
-import static com.matyrobbrt.okzoomer.config.ClientConfig.*;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.CINEMATIC_CAMERA;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.CINEMATIC_MULTIPLIER;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.MAXIMUM_LINEAR_STEP;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.MINIMUM_LINEAR_STEP;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.REDUCE_SENSITIVITY;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.SMOOTH_MULTIPLIER;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.USE_SPYGLASS_TEXTURE;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.ZOOM_DIVISOR;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.ZOOM_OVERLAY;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.ZOOM_TRANSITION;
 
 /**
  * Manages the zoom packets and their signals.
  */
 public class OkZoomerNetwork {
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(OkZoomerAPI.MOD_ID, "network"))
-            .clientAcceptedVersions(e -> true)
-            .serverAcceptedVersions(e -> true)
-            .networkProtocolVersion(() -> "hmm :)")
-            .simpleChannel();
-    public static final EventNetworkChannel EXISTENCE_CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(OkZoomerAPI.MOD_ID, "exists"))
-            .clientAcceptedVersions(e -> true)
-            .serverAcceptedVersions(e -> true)
-            .networkProtocolVersion(() -> "Why'd I exist?!")
-            .eventNetworkChannel();
-
     public enum Acknowledgement {
         NONE,
         HAS_RESTRICTIONS,
@@ -152,7 +147,7 @@ public class OkZoomerNetwork {
         final var overlay = spyglassOverlay == ConfigEnums.ZoomOverlays.OFF ? ZOOM_OVERLAY.get() : spyglassOverlay;
 
         // Sets zoom overlay
-        final var overlayTextureId = new ResourceLocation(
+        final var overlayTextureId = ResourceLocation.parse(
                 (USE_SPYGLASS_TEXTURE.get() || overlay == ConfigEnums.ZoomOverlays.SPYGLASS)
                         ? "textures/misc/spyglass_scope.png"
                         : OkZoomerAPI.MOD_ID + ":textures/misc/zoom_overlay.png");

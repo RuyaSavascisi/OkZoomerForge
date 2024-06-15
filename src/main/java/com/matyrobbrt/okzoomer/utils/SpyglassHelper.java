@@ -13,5 +13,5 @@ public class SpyglassHelper {
     /**
      * The spyglass tag, which is used internally in order to unhardcode behavior specific to vanilla spyglasses
      */
-    public static final TagKey<Item> SPYGLASSES = TagKey.create(Registries.ITEM, new ResourceLocation(OkZoomerAPI.MOD_ID, "spyglasses"));
+    public static final TagKey<Item> SPYGLASSES = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "spyglasses"));
 }

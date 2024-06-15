@@ -2,45 +2,44 @@ package com.matyrobbrt.okzoomer.config;
 
 import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import com.matyrobbrt.okzoomer.utils.ZoomUtils;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ClientConfig {
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
     // Features
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.CinematicCameraOptions> CINEMATIC_CAMERA;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.ZoomTransitionOptions> ZOOM_TRANSITION;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.ZoomModes> ZOOM_MODE;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.ZoomOverlays> ZOOM_OVERLAY;
-    public static final ForgeConfigSpec.EnumValue<ConfigEnums.SpyglassDependency> SPYGLASS_DEPENDENCY;
-    public static final ForgeConfigSpec.BooleanValue REDUCE_SENSITIVITY;
-    public static final ForgeConfigSpec.BooleanValue ALLOW_SCROLLING;
-    public static final ForgeConfigSpec.BooleanValue EXTRA_KEY_BINDS;
-    public static final ForgeConfigSpec.BooleanValue DISABLE_OVERLAY_NO_HUD;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.CinematicCameraOptions> CINEMATIC_CAMERA;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.ZoomTransitionOptions> ZOOM_TRANSITION;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.ZoomModes> ZOOM_MODE;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.ZoomOverlays> ZOOM_OVERLAY;
+    public static final ModConfigSpec.EnumValue<ConfigEnums.SpyglassDependency> SPYGLASS_DEPENDENCY;
+    public static final ModConfigSpec.BooleanValue REDUCE_SENSITIVITY;
+    public static final ModConfigSpec.BooleanValue ALLOW_SCROLLING;
+    public static final ModConfigSpec.BooleanValue EXTRA_KEY_BINDS;
+    public static final ModConfigSpec.BooleanValue DISABLE_OVERLAY_NO_HUD;
 
     // Values
-    public static final ForgeConfigSpec.DoubleValue ZOOM_DIVISOR;
-    public static final ForgeConfigSpec.DoubleValue MINIMUM_ZOOM_DIVISOR;
-    public static final ForgeConfigSpec.DoubleValue MAXIMUM_ZOOM_DIVISOR;
-    public static final ForgeConfigSpec.IntValue UPPER_SCROLL_STEPS;
-    public static final ForgeConfigSpec.IntValue LOWER_SCROLL_STEPS;
-    public static final ForgeConfigSpec.DoubleValue SMOOTH_MULTIPLIER;
-    public static final ForgeConfigSpec.DoubleValue CINEMATIC_MULTIPLIER;
-    public static final ForgeConfigSpec.DoubleValue MINIMUM_LINEAR_STEP;
-    public static final ForgeConfigSpec.DoubleValue MAXIMUM_LINEAR_STEP;
+    public static final ModConfigSpec.DoubleValue ZOOM_DIVISOR;
+    public static final ModConfigSpec.DoubleValue MINIMUM_ZOOM_DIVISOR;
+    public static final ModConfigSpec.DoubleValue MAXIMUM_ZOOM_DIVISOR;
+    public static final ModConfigSpec.IntValue UPPER_SCROLL_STEPS;
+    public static final ModConfigSpec.IntValue LOWER_SCROLL_STEPS;
+    public static final ModConfigSpec.DoubleValue SMOOTH_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue CINEMATIC_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue MINIMUM_LINEAR_STEP;
+    public static final ModConfigSpec.DoubleValue MAXIMUM_LINEAR_STEP;
     
     // Tweaks
-    public static final ForgeConfigSpec.BooleanValue RESET_ZOOM_WITH_MOUSE;
-    public static final ForgeConfigSpec.BooleanValue USE_SPYGLASS_TEXTURE;
-    public static final ForgeConfigSpec.BooleanValue USE_SPYGLASS_SOUNDS;
-    public static final ForgeConfigSpec.BooleanValue SHOW_RESTRICTION_TOASTS;
+    public static final ModConfigSpec.BooleanValue RESET_ZOOM_WITH_MOUSE;
+    public static final ModConfigSpec.BooleanValue USE_SPYGLASS_TEXTURE;
+    public static final ModConfigSpec.BooleanValue USE_SPYGLASS_SOUNDS;
+    public static final ModConfigSpec.BooleanValue SHOW_RESTRICTION_TOASTS;
     
     static {
-        final var builder = new ForgeConfigSpec.Builder();
+        final var builder = new ModConfigSpec.Builder();
 
         // Features
         {

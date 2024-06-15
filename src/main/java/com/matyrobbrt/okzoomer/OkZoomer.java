@@ -3,10 +3,10 @@ package com.matyrobbrt.okzoomer;
 import com.matyrobbrt.okzoomer.api.OkZoomerAPI;
 import com.matyrobbrt.okzoomer.config.ClientConfig;
 import com.matyrobbrt.okzoomer.config.ServerConfig;
-import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
 import com.matyrobbrt.okzoomer.network.packet.AcknowledgeModPacket;
 import com.matyrobbrt.okzoomer.network.packet.DisableZoomPacket;
 import com.matyrobbrt.okzoomer.network.packet.DisableZoomScrollingPacket;
+import com.matyrobbrt.okzoomer.network.packet.ExistingPacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceClassicModePacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceOverlayPacket;
 import com.matyrobbrt.okzoomer.network.packet.ForceSpyglassPacket;
@@ -18,64 +18,57 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkConstants;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.command.EnumArgument;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.server.command.EnumArgument;
 
 import java.util.function.Function;
 
 @Mod(OkZoomerAPI.MOD_ID)
 public class OkZoomer {
 
-    public OkZoomer() {
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-                () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+    public OkZoomer(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, OkZoomerAPI.MOD_ID + "-client.toml");
+        container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC, OkZoomerAPI.MOD_ID + "-sever.toml");
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, OkZoomerAPI.MOD_ID + "-client.toml");
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC, OkZoomerAPI.MOD_ID + "-sever.toml");
-
-        final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modBus.addListener(OkZoomer::commonSetup);
+        modBus.addListener(OkZoomer::registerPayloads);
         modBus.register(ClientConfig.class);
         modBus.register(ServerConfig.class);
 
-        MinecraftForge.EVENT_BUS.addListener(OkZoomer::registerClientCommands);
-        MinecraftForge.EVENT_BUS.addListener(OkZoomer::onPlayerLogout);
-        MinecraftForge.EVENT_BUS.addListener(OkZoomer::onPlayerLogin);
+        NeoForge.EVENT_BUS.addListener(OkZoomer::registerClientCommands);
+        NeoForge.EVENT_BUS.addListener(OkZoomer::onPlayerLogout);
+        NeoForge.EVENT_BUS.addListener(OkZoomer::onPlayerLogin);
     }
 
-    static void commonSetup(final FMLCommonSetupEvent event) {
+    static void registerPayloads(final RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar("1.0.0");
         class PacketRegister {
-            int pktIndex = 0;
-
-            <T extends Packet> void register(Class<T> clazz, Function<FriendlyByteBuf, T> decode) {
-                OkZoomerNetwork.CHANNEL.messageBuilder(clazz, pktIndex++)
-                        .encoder(Packet::encode)
-                        .decoder(decode)
-                        .consumerMainThread((pkt, sup) -> pkt.handle(sup.get()))
-                        .add();
+            <T extends Packet> void register(CustomPacketPayload.Type<T> clazz, Function<FriendlyByteBuf, T> decode) {
+                registrar.playToClient(clazz, StreamCodec.of((buf, pkt) -> pkt.encode(buf), decode::apply), Packet::handle);
             }
         }
 
         final var packets = new PacketRegister();
-        packets.register(DisableZoomPacket.class, DisableZoomPacket::decode);
-        packets.register(DisableZoomScrollingPacket.class, DisableZoomScrollingPacket::decode);
-        packets.register(ForceClassicModePacket.class, ForceClassicModePacket::decode);
-        packets.register(ForceZoomDivisorPacket.class, ForceZoomDivisorPacket::decode);
-        packets.register(AcknowledgeModPacket.class, AcknowledgeModPacket::decode);
-        packets.register(ForceSpyglassPacket.class, ForceSpyglassPacket::decode);
-        packets.register(ForceOverlayPacket.class, ForceOverlayPacket::decode);
-        packets.register(ResetRestrictionsPacket.class, ResetRestrictionsPacket::decode);
+        packets.register(DisableZoomPacket.TYPE, DisableZoomPacket::decode);
+        packets.register(DisableZoomScrollingPacket.TYPE, DisableZoomScrollingPacket::decode);
+        packets.register(ForceClassicModePacket.TYPE, ForceClassicModePacket::decode);
+        packets.register(ForceZoomDivisorPacket.TYPE, ForceZoomDivisorPacket::decode);
+        packets.register(AcknowledgeModPacket.TYPE, AcknowledgeModPacket::decode);
+        packets.register(ForceSpyglassPacket.TYPE, ForceSpyglassPacket::decode);
+        packets.register(ForceOverlayPacket.TYPE, ForceOverlayPacket::decode);
+        packets.register(ResetRestrictionsPacket.TYPE, ResetRestrictionsPacket::decode);
+
+        registrar.playBidirectional(ExistingPacket.TYPE, StreamCodec.unit(new ExistingPacket()), (pkt, handler) -> {});
     }
 
     static void registerClientCommands(final RegisterClientCommandsEvent event) {
@@ -100,8 +93,8 @@ public class OkZoomer {
     }
 
     static void onPlayerLogout(final PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && OkZoomerNetwork.EXISTENCE_CHANNEL.isRemotePresent(player.connection.connection)) {
-            OkZoomerNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ResetRestrictionsPacket());
+        if (event.getEntity() instanceof ServerPlayer player && player.connection.hasChannel(ExistingPacket.TYPE)) {
+            PacketDistributor.sendToPlayer(player, new ResetRestrictionsPacket());
         }
     }
 }

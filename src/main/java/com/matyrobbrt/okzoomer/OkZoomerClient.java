@@ -16,28 +16,40 @@ import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = OkZoomerAPI.MOD_ID, value = Dist.CLIENT)
+@Mod(value = OkZoomerAPI.MOD_ID, dist = Dist.CLIENT)
 public class OkZoomerClient {
 
-    private static boolean shouldCancelOverlay;
-    private static final ResourceLocation OVERLAY_NAME = new ResourceLocation(OkZoomerAPI.MOD_ID, "okzoomer");
+    public OkZoomerClient(IEventBus bus) {
+        bus.addListener(OkZoomerClient::registerOverlay);
+        bus.addListener(OkZoomerClient::registerKeys);
+        bus.addListener(OkZoomerClient::clientSetup);
 
-    @SubscribeEvent
-    static void registerOverlay(final RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(OVERLAY_NAME.getPath(), (gui, poseStack, partialTick, width, height) -> {
+        NeoForge.EVENT_BUS.addListener(OkZoomerClient::clientTick);
+        NeoForge.EVENT_BUS.addListener(OkZoomerClient::onMouseInput);
+        NeoForge.EVENT_BUS.addListener(OkZoomerClient::renderOverlay);
+        NeoForge.EVENT_BUS.addListener(OkZoomerClient::onMouseScroll);
+    }
+
+    private static boolean shouldCancelOverlay;
+    private static final ResourceLocation OVERLAY_NAME = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "okzoomer");
+
+    private static void registerOverlay(final RegisterGuiLayersEvent event) {
+        event.registerAboveAll(OVERLAY_NAME, (gui, delta) -> {
             shouldCancelOverlay = false;
             for (ZoomInstance instance : APIImpl.getZoomInstances()) {
                 ZoomOverlay overlay = instance.getZoomOverlay();
@@ -46,28 +58,21 @@ public class OkZoomerClient {
                     if (overlay.getActive()) {
                         // noinspection PointlessBooleanExpression,ConstantConditions
                         shouldCancelOverlay = overlay.cancelOverlayRendering() || true;
-                        overlay.renderOverlay();
+                        overlay.renderOverlay(gui);
                     }
                 }
             }
         });
     }
 
-    @SubscribeEvent
-    static void clientSetup(final FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.addListener(OkZoomerClient::clientTick);
-        MinecraftForge.EVENT_BUS.addListener(OkZoomerClient::onMouseInput);
-        MinecraftForge.EVENT_BUS.addListener(OkZoomerClient::renderOverlay);
-        MinecraftForge.EVENT_BUS.addListener(OkZoomerClient::onMouseScroll);
-
-        ItemProperties.registerGeneric(new ResourceLocation(OkZoomerAPI.MOD_ID, "scoping"),
+    private static void clientSetup(final FMLClientSetupEvent event) {
+        ItemProperties.registerGeneric(ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "scoping"),
                 (ClampedItemPropertyFunction) (stack, clientWorld, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && entity.getUseItem().is(SpyglassHelper.SPYGLASSES) ? 1.0F : 0.0F);
 
         OkZoomerNetwork.configureZoomInstance();
     }
 
-    @SubscribeEvent
-    static void registerKeys(final RegisterKeyMappingsEvent event) {
+    private static void registerKeys(final RegisterKeyMappingsEvent event) {
         event.register(ZoomKeyBinds.ZOOM_KEY);
 
         // Extra keybinds
@@ -76,9 +81,9 @@ public class OkZoomerClient {
         event.register(ZoomKeyBinds.RESET_ZOOM_KEY);
     }
 
-    static void renderOverlay(final RenderGuiOverlayEvent.Pre event) {
+    static void renderOverlay(final RenderGuiLayerEvent.Pre event) {
         if (Minecraft.getInstance().level == null) return;
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.SPYGLASS.id())) {
+        if (event.getName().equals(VanillaGuiLayers.CAMERA_OVERLAYS)) {
             boolean enable = !shouldCancelOverlay;
             if (switch (OkZoomerNetwork.getSpyglassDependency()) {
                 case REPLACE_ZOOM, BOTH -> true;
@@ -92,8 +97,8 @@ public class OkZoomerClient {
         }
     }
 
-    static void clientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.ClientTickEvent.Phase.END && Minecraft.getInstance().level == null)
+    static void clientTick(ClientTickEvent.Post event) {
+        if (Minecraft.getInstance().level == null)
             return;
         ManageKeyBindsEvent.onTickEnd();
         ManageZoomEvent.endTick(Minecraft.getInstance());
@@ -117,8 +122,8 @@ public class OkZoomerClient {
                 return;
             }
 
-            if (event.getScrollDelta() != 0 && ZoomUtils.ZOOMER_ZOOM.getZoom()) {
-                ZoomUtils.changeZoomDivisor(event.getScrollDelta() > 0);
+            if (event.getScrollDeltaY() != 0 && ZoomUtils.ZOOMER_ZOOM.getZoom()) {
+                ZoomUtils.changeZoomDivisor(event.getScrollDeltaY() > 0);
                 event.setCanceled(true);
             }
         }
@@ -128,7 +133,7 @@ public class OkZoomerClient {
 
     public static void sendToast(Component description) {
         if (ClientConfig.SHOW_RESTRICTION_TOASTS.get()) {
-            Minecraft.getInstance().getToasts().addToast(SystemToast.multiline(Minecraft.getInstance(), SystemToast.SystemToastIds.TUTORIAL_HINT, TOAST_TITLE, description));
+            Minecraft.getInstance().getToasts().addToast(SystemToast.multiline(Minecraft.getInstance(), new SystemToast.SystemToastId(), TOAST_TITLE, description));
         }
     }
 }

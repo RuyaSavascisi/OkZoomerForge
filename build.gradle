@@ -1,158 +1,64 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import org.groovymc.modsdotgroovy.gradle.tasks.GatherNeoForgePlatformDetails
 
-buildscript {
-	repositories {
-		// These repositories are only for Gradle plugins, put any other repositories in the repository block further below
-		maven { url = 'https://maven.minecraftforge.net' }
-		mavenCentral()
-	}
-	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-		classpath 'org.spongepowered:mixingradle:0.7.+'
-	}
-}
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 plugins {
-	id 'eclipse'
-	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow' version '7.1.2'
-	id 'io.github.groovymc.modsdotgroovy' version '1.1.2'
+    // Apply the plugin. You can find the latest version at https://github.com/neoforged/ModDevGradle/packages/2159800.
+    id 'net.neoforged.moddev' version '0.1.80'
+    id 'org.groovymc.modsdotgroovy' version '2.0.0-beta.28'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.spongepowered.mixin'
-
-modsDotGroovy {
-	dslVersion = '1.2.0'
-	platform 'forge'
-}
-
-group = 'com.matyrobbrt.okzoomer' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = modid + "-forge-" + minecraft_version
-
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 sourceSets {
-	api {}
+    api
 }
 
-configurations {
-	apiImplementation.extendsFrom(minecraft)
+final mcVersion = "1.${neo_version.split('\\.', 3)[0]}.${neo_version.split('\\.', 3)[1]}"
 
-	library
-	implementation.extendsFrom(library)
+base {
+    archivesName = modid + '-neoforge-' + mcVersion
 }
 
-mixin {
-	add sourceSets.main, 'okzoomer.mixins.refmap.json'
-	config 'okzoomer.mixins.json'
-	debug.export = true
-	debug.verbose = true
+modsDotGroovy {
+    platform org.groovymc.modsdotgroovy.types.core.Platform.NEOFORGE
 }
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-	mappings channel: 'official', version: minecraft_version
-	runs {
-		all {
-			property 'forge.logging.console.level', 'debug'
-			property 'forge.enabledGameTestNamespaces', modid
-			mods {
-				okzoomer {
-					source sourceSets.api
-					source sourceSets.main
-				}
-			}
-			lazyToken('minecraft_classpath') {
-				configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-			}
-		}
-
-		client {
-			workingDirectory project.file('run/client')
-		}
-		server {
-			workingDirectory project.file('run/server')
-		}
-		gameTestServer {
-			workingDirectory project.file('run/server')
-		}
-		data {
-			workingDirectory project.file('run/client')
-			args '--mod', modid, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-		}
-	}
+tasks.withType(GatherNeoForgePlatformDetails) {
+    platformVersion = neoForge.version
+    minecraftVersion = mcVersion
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge {
+    addModdingDependenciesTo(sourceSets.api)
 
-repositories {
-    maven { url 'https://jitpack.io' }
+    // We currently only support NeoForge versions later than 21.0.x
+    version = "${neo_version}"
+
+    parchment {
+        minecraftVersion = '1.20.6'
+        mappingsVersion = '2024.06.02'
+    }
+
+    runs {
+        client {
+            client()
+        }
+        data {
+            data()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        okzoomer {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.api
+        }
+    }
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-	compileOnly group:'com.google.auto.service', name:'auto-service', version:'1.0.1'
-	annotationProcessor group:'com.google.auto.service', name:'auto-service', version:'1.0.1'
-
-	implementation sourceSets.api.output
-
-    library 'com.github.LlamaLad7:MixinExtras:0.0.10'
-    annotationProcessor 'com.github.LlamaLad7:MixinExtras:0.0.10'
-
-	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-Map<?, ?> makeAttributes() {
-	return [
-			"Specification-Title"     : "OkZoomer",
-			"Specification-Vendor"    : "Matyrobbrt",
-			"Specification-Version"   : "1",
-			"Implementation-Title"    : project.name,
-			"Implementation-Version"  : project.jar.archiveVersion,
-			"Implementation-Vendor"   : "Matyrobbrt",
-			"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-			"MixinConfigs"            : 'okzoomer.mixins.json'
-	]
-}
-
-tasks.create('relocateShadowJar', ConfigureShadowRelocation) {
-	target(tasks.shadowJar)
-	prefix("com.matyrobbrt.okzoomer.shade")
-}
-
-tasks.named('shadowJar', ShadowJar).configure {
-	archiveClassifier.set('')
-	configurations = [project.configurations.library]
-	dependsOn('relocateShadowJar')
-	manifest.attributes(makeAttributes())
-	from sourceSets.api.output
-	from 'LICENSE'
-	exclude 'META-INF/services/javax.*'
-}
-
-jar {
-	from 'LICENSE'
-	classifier 'lite'
-	from sourceSets.api.output
-	manifest.attributes(makeAttributes())
-}
-
-jar.finalizedBy('reobfJar')
-reobf {
-	shadowJar {}
-}
-shadowJar.finalizedBy('reobfShadowJar')
-
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-processResources {
-	inputs.property 'version', project.version
-
-	filesMatching('META-INF/mods.toml') {
-		expand 'version': project.version
-	}
+    implementation sourceSets.api.output
+    compileOnly group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1'
+    annotationProcessor group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1'
 }

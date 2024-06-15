@@ -9,7 +9,7 @@ import net.minecraft.util.Mth;
  * An implementation of Ok Zoomer's smooth transitions (and Vanilla's spyglass zoom) as a transition mode
  */
 public class SmoothTransitionMode implements TransitionMode {
-    private static final ResourceLocation TRANSITION_ID = new ResourceLocation(OkZoomerAPI.MOD_ID,"smooth_transition");
+    private static final ResourceLocation TRANSITION_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID,"smooth_transition");
     private boolean active;
     private final float smoothMultiplier;
     private double fovMultiplier;

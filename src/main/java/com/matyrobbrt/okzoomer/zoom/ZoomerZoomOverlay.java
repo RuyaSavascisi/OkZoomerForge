@@ -3,20 +3,26 @@ package com.matyrobbrt.okzoomer.zoom;
 import com.matyrobbrt.okzoomer.api.OkZoomerAPI;
 import com.matyrobbrt.okzoomer.api.ZoomOverlay;
 import com.matyrobbrt.okzoomer.config.ClientConfig;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import com.matyrobbrt.okzoomer.config.ConfigEnums.ZoomTransitionOptions;
 
+import java.util.Objects;
+
 // Implements the zoom overlay
 public class ZoomerZoomOverlay implements ZoomOverlay {
-    private static final ResourceLocation OVERLAY_ID = new ResourceLocation(OkZoomerAPI.MOD_ID, "zoom_overlay");
+    private static final ResourceLocation OVERLAY_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "zoom_overlay");
     private ResourceLocation textureId;
     private boolean active;
     private boolean zoomActive;
@@ -46,24 +52,19 @@ public class ZoomerZoomOverlay implements ZoomOverlay {
     }
 
     @Override
-    public void renderOverlay() {
+    public void renderOverlay(GuiGraphics graphics) {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.zoomOverlayAlpha);
-        RenderSystem.setShaderTexture(0, this.textureId);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(0.0D, (double) this.client.getWindow().getGuiScaledHeight(), -90.0D).uv(0.0F, 1.0F).endVertex();
-        bufferBuilder.vertex((double) this.client.getWindow().getGuiScaledWidth(), (double) this.client.getWindow().getGuiScaledHeight(), -90.0D).uv(1.0F, 1.0F).endVertex();
-        bufferBuilder.vertex((double) this.client.getWindow().getGuiScaledWidth(), 0.0D, -90.0D).uv(1.0F, 0.0F).endVertex();
-        bufferBuilder.vertex(0.0D, 0.0D, -90.0D).uv(0.0F, 0.0F).endVertex();
-        tessellator.end();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        float lerpedOverlayAlpha = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), this.lastZoomOverlayAlpha, this.zoomOverlayAlpha);
+        RenderSystem.setShaderColor(lerpedOverlayAlpha, lerpedOverlayAlpha, lerpedOverlayAlpha, 1.0F);
+        graphics.blit(this.textureId, 0, 0, -90, 0.0F, 0.0F, graphics.guiWidth(), graphics.guiHeight(), graphics.guiWidth(), graphics.guiHeight());
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableBlend();
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.util.SmoothDouble;
 
 // The implementation of the multiplied cinematic camera
 public class MultipliedCinematicCameraMouseModifier implements MouseModifier {
-    private static final ResourceLocation MODIFIER_ID = new ResourceLocation(OkZoomerAPI.MOD_ID, "multiplied_cinematic_camera");
+    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "multiplied_cinematic_camera");
     private boolean active;
     private final Minecraft client;
     private boolean cinematicCameraEnabled;

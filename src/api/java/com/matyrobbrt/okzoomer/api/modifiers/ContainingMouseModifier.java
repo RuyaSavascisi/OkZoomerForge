@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
  * A mouse modifier that contains multiple mouse modifiers.
  */
 public class ContainingMouseModifier implements MouseModifier {
-    private static final ResourceLocation MODIFIER_ID = new ResourceLocation(OkZoomerAPI.MOD_ID,"modifier_container");
+    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID,"modifier_container");
     private boolean active;
     private final MouseModifier[] modifiers;
 

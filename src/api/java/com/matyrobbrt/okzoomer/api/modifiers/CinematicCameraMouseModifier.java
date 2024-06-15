@@ -10,7 +10,7 @@ import net.minecraft.util.SmoothDouble;
  * An implemenation of Vanilla's Cinematic Camera as a mouse modifier
  */
 public class CinematicCameraMouseModifier implements MouseModifier {
-    private static final ResourceLocation MODIFIER_ID = new ResourceLocation(OkZoomerAPI.MOD_ID, "cinematic_camera");
+    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "cinematic_camera");
     private boolean active;
     private final Minecraft mc;
     private boolean cinematicCameraEnabled;

@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
  * An implementation of the spyglass' reduction of the mouse sensitivity as a mouse modifier
 */
 public class SpyglassMouseModifier implements MouseModifier {
-    private static final ResourceLocation MODIFIER_ID = new ResourceLocation(OkZoomerAPI.MOD_ID,"spyglass");
+    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID,"spyglass");
     private boolean active;
 
     /**

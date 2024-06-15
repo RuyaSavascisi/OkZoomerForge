@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
  * A mouse modifier which reduces the cursor sensitivity with the transition mode's internal multiplier
  */
 public class ZoomDivisorMouseModifier implements MouseModifier {
-    private static final ResourceLocation MODIFIER_ID = new ResourceLocation(OkZoomerAPI.MOD_ID,"zoom_divisor");
+    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID,"zoom_divisor");
     private boolean active;
 
     /**

@@ -5,7 +5,6 @@ import com.matyrobbrt.okzoomer.api.ZoomInstance;
 import com.matyrobbrt.okzoomer.api.modifiers.ZoomDivisorMouseModifier;
 import com.matyrobbrt.okzoomer.api.transitions.SmoothTransitionMode;
 import com.matyrobbrt.okzoomer.network.OkZoomerNetwork;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -14,7 +13,11 @@ import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.matyrobbrt.okzoomer.config.ClientConfig.*;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.LOWER_SCROLL_STEPS;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.MAXIMUM_ZOOM_DIVISOR;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.MINIMUM_ZOOM_DIVISOR;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.UPPER_SCROLL_STEPS;
+import static com.matyrobbrt.okzoomer.config.ClientConfig.ZOOM_DIVISOR;
 
 // The class that contains most of the logic behind the zoom itself
 public class ZoomUtils {
@@ -22,14 +25,14 @@ public class ZoomUtils {
     public static final Logger LOGGER = LoggerFactory.getLogger("Ok Zoomer");
 
     public static final ZoomInstance ZOOMER_ZOOM = OkZoomerAPI.INSTANCE.registerZoom(OkZoomerAPI.INSTANCE.createZoomInstance(
-            new ResourceLocation("ok_zoomer:zoom"),
+            ResourceLocation.parse("ok_zoomer:zoom"),
             4.0F,
             new SmoothTransitionMode(0.75f),
             new ZoomDivisorMouseModifier(),
             null
     ));
 
-    public static final TagKey<Item> ZOOM_DEPENDENCIES_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(OkZoomerAPI.MOD_ID, "zoom_dependencies"));
+    public static final TagKey<Item> ZOOM_DEPENDENCIES_TAG = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "zoom_dependencies"));
 
     public static int zoomStep = 0;
 

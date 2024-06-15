@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
  * An implementation of a simple zoom as a transition mode
  */
 public class InstantTransitionMode implements TransitionMode {
-    private static final ResourceLocation TRANSITION_ID = new ResourceLocation(OkZoomerAPI.MOD_ID, "no_transition");
+    private static final ResourceLocation TRANSITION_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "no_transition");
     private boolean active;
     private double divisor;
 

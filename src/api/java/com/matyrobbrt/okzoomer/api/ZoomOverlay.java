@@ -1,5 +1,6 @@
 package com.matyrobbrt.okzoomer.api;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -33,7 +34,7 @@ public interface ZoomOverlay {
     /**
      * Renders the overlay itself. It's injected by LibZoomer itself.
      */
-    void renderOverlay();
+    void renderOverlay(GuiGraphics graphics);
 
     /**
      * The tick method. Used in order to keep the internal variables accurate and the overlay functional.

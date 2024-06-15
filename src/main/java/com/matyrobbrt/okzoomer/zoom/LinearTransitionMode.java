@@ -7,7 +7,7 @@ import net.minecraft.util.Mth;
 
 // The implementation of the linear transition
 public class LinearTransitionMode implements TransitionMode {
-    private static final ResourceLocation TRANSITION_ID = new ResourceLocation(OkZoomerAPI.MOD_ID, "linear_transition");
+    private static final ResourceLocation TRANSITION_ID = ResourceLocation.fromNamespaceAndPath(OkZoomerAPI.MOD_ID, "linear_transition");
     private boolean active;
     private double minimumLinearStep;
     private double maximumLinearStep;

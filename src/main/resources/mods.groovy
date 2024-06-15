@@ -1,6 +1,6 @@
-ModsDotGroovy.make {
+NeoForgeModsDotGroovy.make {
     modLoader = 'javafml'
-    loaderVersion = '[44,)'
+    loaderVersion = '[3,)'
 
     license = 'MIT'
     issueTrackerUrl = 'https://github.com/Matyrobbrt/OkZoomerForge/issues'
@@ -8,7 +8,7 @@ ModsDotGroovy.make {
     mod {
         modId = 'okzoomer'
         displayName = 'OkZoomer'
-        version = this.version
+        version = environmentInfo.version
 
         author = 'Matyrobbrt'
         credits = 'EnnuiL, for the Fabric mod'
@@ -17,11 +17,12 @@ ModsDotGroovy.make {
         description = 'Adds a highly-configurable zoom key for Forge. The zoom is yours!'
 
         dependencies {
-            forge {
-                side = DependencySide.CLIENT
-                versionRange = "[${this.forgeVersion},)"
-            }
-            minecraft = this.minecraftVersionRange
+            neoforge = ">=${platformVersion}"
+            minecraft = minecraftVersionRange
         }
+    }
+
+    mixins {
+        mixin('okzoomer.mixins.json')
     }
 }
