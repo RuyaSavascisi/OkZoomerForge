@@ -1,0 +1,11 @@
+{
+  "toast.okzoomer.title": "Ok Zoomer",
+  "toast.okzoomer.acknowledge_mod": "Mod, bu sunucu tarafından izin verilmiş",
+  "toast.okzoomer.acknowledge_mod_restrictions": "Bu sunucu modu kısıtlıyor",
+  "command.okzoomer.client.config_present": "Yapılandırma ön ayar %s olarak sıfırlandı!",
+  "key.okzoomer.category": "Yakınlaştırma",
+  "key.okzoomer.decrease_zoom": "Yakınlaştırmayı Azalt",
+  "key.okzoomer.increase_zoom": "Yakınlaştırmayı Artır",
+  "key.okzoomer.reset_zoom": "Yakınlaştırmayı Sıfırla",
+  "key.okzoomer.zoom": "Yakınlaştır"
+}
